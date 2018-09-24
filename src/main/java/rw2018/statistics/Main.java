@@ -40,6 +40,8 @@ public class Main {
     try (StatisticsDB statisticsDB = getStatisticsDB();) {
       statisticsDB.setUp(statisticsDir, chunks.length);
 
+      int statsCounter = 1;
+
       for (int chunkI = 0; chunkI < chunks.length; chunkI++) {
         File chunk = chunks[chunkI];
         try (EncodedFileInputStream input = new EncodedFileInputStream(EncodingFileFormat.EEE,
@@ -50,10 +52,16 @@ public class Main {
             statisticsDB.incrementFrequency(stmt.getPropertyAsLong(), chunkI,
                     TriplePosition.PROPERTY);
             statisticsDB.incrementFrequency(stmt.getObjectAsLong(), chunkI, TriplePosition.OBJECT);
+            if (statsCounter % 100 == 0) {
+              System.out.println(statisticsDB.prettyPrint());
+              statsCounter = 1;
+            }
+            statsCounter++;
           }
         } catch (IOException e) {
           throw new RuntimeException(e);
         }
+        System.out.println(statisticsDB.prettyPrint());
       }
     }
   }
