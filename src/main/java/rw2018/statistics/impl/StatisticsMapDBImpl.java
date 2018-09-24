@@ -26,15 +26,15 @@ public class StatisticsMapDBImpl implements StatisticsDB {
         // TODO Auto-generated method stub
         this.bits = chunkBits(numberOfChunks);
         this.numberOfChunks = numberOfChunks;
-        db = DBMaker.memoryDirectDB().make();
+//        db = DBMaker.memoryDirectDB().make();
         final File file = new File(statisticsDir, "map.db");
         file.delete();
-//        db = DBMaker.fileDB(file)
-//                    .fileMmapEnableIfSupported()
-//                    .concurrencyDisable()
-//                    .fileMmapPreclearDisable()
-//                    .cleanerHackEnable()
-//                    .make();
+        db = DBMaker.fileDB(file)
+                    .fileMmapEnableIfSupported()
+                    .concurrencyDisable()
+                    .fileMmapPreclearDisable()
+                    .cleanerHackEnable()
+                    .make();
         db.getStore().fileLoad();
         this.map = db.hashMap("map", Serializer.STRING, Serializer.LONG_PACKED).create();
     }
