@@ -65,12 +65,16 @@ public class Main {
         }
         printStats(statisticsDB);
       }
+      printStatsFinal(statisticsDB);
     }
+  }
+
+  private static void printStatsFinal(final StatisticsDB statisticsDB) {
+    System.out.println(statisticsDB.prettyPrint());
   }
 
   private static void printStats(final StatisticsDB statisticsDB) {
     System.out.println(".");
-//    System.out.println(statisticsDB.prettyPrint());
   }
 
   @NotNull
