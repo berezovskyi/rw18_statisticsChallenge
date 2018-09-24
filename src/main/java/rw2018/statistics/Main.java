@@ -12,7 +12,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
+import org.jetbrains.annotations.NotNull;
 import rw2018.statistics.impl.StatisticsDBBaseImpl;
+import rw2018.statistics.impl.StatisticsMapDBImpl;
 import rw2018.statistics.io.EncodedFileInputStream;
 import rw2018.statistics.io.EncodingFileFormat;
 import rw2018.statistics.io.Statement;
@@ -35,7 +37,7 @@ public class Main {
     }
 
     // TODO adjust to your implementation
-    try (StatisticsDB statisticsDB = new StatisticsDBBaseImpl();) {
+    try (StatisticsDB statisticsDB = getStatisticsDB();) {
       statisticsDB.setUp(statisticsDir, chunks.length);
 
       for (int chunkI = 0; chunkI < chunks.length; chunkI++) {
@@ -54,6 +56,11 @@ public class Main {
         }
       }
     }
+  }
+
+  @NotNull
+  private static StatisticsDB getStatisticsDB() {
+    return new StatisticsMapDBImpl();
   }
 
   public static void main(String[] args) throws ParseException {

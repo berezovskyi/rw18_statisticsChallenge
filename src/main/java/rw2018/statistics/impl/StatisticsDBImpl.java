@@ -12,7 +12,7 @@ import rw2018.statistics.TriplePosition;
  */
 public class StatisticsDBImpl implements StatisticsDB {
 
-  @Override
+    @Override
   public void setUp(File statisticsDir, int numberOfChunks) {
     // TODO Auto-generated method stub
 
