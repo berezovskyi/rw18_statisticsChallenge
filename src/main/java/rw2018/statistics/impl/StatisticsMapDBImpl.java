@@ -42,7 +42,7 @@ public class StatisticsMapDBImpl implements StatisticsDB {
     public void incrementFrequency(long resourceId, int chunkNumber,
             TriplePosition triplePosition) {
         final String key = key(resourceId, chunkNumber, triplePosition);
-        final Long aLong = map.get(key);
+        final Long aLong = map.getOrDefault(key, 0l);
         map.put(key, aLong + 1);
     }
 
