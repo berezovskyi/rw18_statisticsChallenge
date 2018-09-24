@@ -67,8 +67,9 @@ public class StatisticsDBBaseImpl implements StatisticsDB {
                 + " is not supported. Supported triple positions are "
                 + Arrays.toString(getTriplePositions()) + ".");
       }
+      final int idx = (indexOfTriplePosition * numberOfChunks) + chunkNumber;
       long offset = ((resourceId - 1) * sizeOfRow)
-              + (((indexOfTriplePosition * numberOfChunks) + chunkNumber) * Long.BYTES);
+              + (idx * Long.BYTES);
 
       statistics.seek(offset);
       long value = 1;

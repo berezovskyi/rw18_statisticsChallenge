@@ -52,18 +52,25 @@ public class Main {
             statisticsDB.incrementFrequency(stmt.getPropertyAsLong(), chunkI,
                     TriplePosition.PROPERTY);
             statisticsDB.incrementFrequency(stmt.getObjectAsLong(), chunkI, TriplePosition.OBJECT);
-            if (statsCounter % 100 == 0) {
-              System.out.println(statisticsDB.prettyPrint());
-              statsCounter = 1;
-            }
-            statsCounter++;
+//            if (statsCounter % 5  == 0) {
+//              System.out.println(statisticsDB.prettyPrint());
+//              statsCounter = 1;
+//            }
+//            statsCounter++;
+//            printStats(statisticsDB);
+
           }
         } catch (IOException e) {
           throw new RuntimeException(e);
         }
-        System.out.println(statisticsDB.prettyPrint());
+        printStats(statisticsDB);
       }
     }
+  }
+
+  private static void printStats(final StatisticsDB statisticsDB) {
+    System.out.println(".");
+//    System.out.println(statisticsDB.prettyPrint());
   }
 
   @NotNull

@@ -1,6 +1,7 @@
 package rw2018.statistics.impl;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentMap;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -25,8 +26,13 @@ public class StatisticsMapDBImpl implements StatisticsDB {
         // TODO Auto-generated method stub
         this.bits = chunkBits(numberOfChunks);
         this.numberOfChunks = numberOfChunks;
-        db = DBMaker.memoryDB().make();
-        this.map = db.hashMap("map", Serializer.STRING, Serializer.LONG_PACKED).createOrOpen();
+//        db = DBMaker.memoryDB().make();
+        db = DBMaker.fileDB(new File(statisticsDir, "map.db"))
+//                    .fileDeleteAfterClose()
+                    .fileMmapEnableIfSupported()
+                    .concurrencyDisable()
+                    .make();
+        this.map = db.hashMap("map", Serializer.STRING, Serializer.LONG_PACKED).create();
     }
 
     int chunkBits(final int numberOfChunks) {
@@ -41,20 +47,48 @@ public class StatisticsMapDBImpl implements StatisticsDB {
     @Override
     public void incrementFrequency(long resourceId, int chunkNumber,
             TriplePosition triplePosition) {
-        final String key = key(resourceId, chunkNumber, triplePosition);
+        final String key = stringKey(resourceId, chunkNumber, triplePosition);
+//        final Long key = baseKey(resourceId, chunkNumber, triplePosition);
         final Long aLong = map.getOrDefault(key, 0l);
         map.put(key, aLong + 1);
     }
 
-    private String key(final long resourceId, final int chunkNumber,
+//    private Long key(final long resourceId, final int chunkNumber,
+//            final TriplePosition triplePosition) {
+////        return stringKey(resourceId, chunkNumber, triplePosition);
+////        return baseKey(resourceId, chunkNumber, triplePosition);
+//    }
+
+    private long baseKey(final long resourceId, final int chunkNumber,
+            final TriplePosition triplePosition) {
+        long sizeOfRow = 8 * numberOfChunks * 3;
+        int indexOfTriplePosition = -1;
+        for (int i = 0; i < getTriplePositions().length; i++) {
+            if (getTriplePositions()[i] == triplePosition) {
+                indexOfTriplePosition = i;
+            }
+        }
+        if (indexOfTriplePosition == -1) {
+            throw new IllegalArgumentException("The triple position " + triplePosition
+                                                       + " is not supported. Supported triple positions are "
+                                                       + Arrays.toString(getTriplePositions()) + ".");
+        }
+        final int idx = (indexOfTriplePosition * numberOfChunks) + chunkNumber;
+        long offset = ((resourceId - 1) * sizeOfRow)
+                + (idx * Long.BYTES);
+        return offset;
+    }
+
+    private String stringKey(final long resourceId, final int chunkNumber,
             final TriplePosition triplePosition) {
         return String.format("%d.%d.%s", resourceId, chunkNumber, triplePosition);
     }
 
     @Override
     public long getFrequency(long resourceId, int chunkNumber, TriplePosition triplePosition) {
-        final String key = key(resourceId, chunkNumber, triplePosition);
-        return map.get(key);
+        final String key = stringKey(resourceId, chunkNumber, triplePosition);
+//        final Long key = baseKey(resourceId, chunkNumber, triplePosition);
+        return map.getOrDefault(key, 0l);
     }
 
     @Override
